@@ -17,6 +17,8 @@ namespace Game
         private Tile[,] tiles;
         private List<GameObject> obstacles;
         private List<GameObject> fruits;
+        
+        public Action<Tile> OnGenerateFruit;
 
         public List<GameObject> Obstacles
         {
@@ -56,7 +58,7 @@ namespace Game
                 }
             }
             random = new Random();
-            GenerateFood();
+
             GenerateObstacles();
             //DrawField();
         }
@@ -67,7 +69,7 @@ namespace Game
             
         }
         
-        public void GenerateFood() 
+        public void GenerateFruit() 
         { 
             for (int i = 0; i < fruitAmount; i++)
             {
@@ -79,6 +81,7 @@ namespace Game
                     continue;
                 }
                 tiles[column, row].TileType = TileType.Fruit;
+                OnGenerateFruit.Invoke(tiles[column, row]);
             }
         }
 

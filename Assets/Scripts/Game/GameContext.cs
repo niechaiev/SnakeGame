@@ -77,10 +77,18 @@ namespace Game
         public void InitializeGame()
         {
             field = new Field(fieldWidth, fieldHeight,3,5,1);
+            field.OnGenerateFruit += PoolFruit;
+            field.GenerateFruit();
             InitializeSnake();
             game = new Game(snake, field);
             intervalCoroutine = StartCoroutine(Interval());
             playerControlsUI.gameObject.SetActive(true);
+        }
+
+        private void PoolFruit(Tile fruitTile)
+        {
+            fruitTile.TileObject = PoolObject(fruitTile, fruitPool);
+            field.Fruits.Add(fruitTile.TileObject);
         }
 
         public void RestartGame()
@@ -123,6 +131,7 @@ namespace Game
 
         private void PoolSnakeSegment(Tile snakeTile)
         {
+            field.Fruits.Remove(snakeTile.TileObject);
             fruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = PoolObject(snakeTile, snakePool);
         }
@@ -141,7 +150,6 @@ namespace Game
             {
                 yield return new WaitForSeconds(snakeSpeed);
                 game.Update();
-                DrawTiles(field.Tiles);
             }
         }
 

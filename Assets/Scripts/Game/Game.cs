@@ -25,7 +25,7 @@ namespace Game
             
             if (nextTile.TileType == TileType.Fruit) { 
                 snake.Grow(nextTile); 
-                field.GenerateFood(); 
+                field.GenerateFruit(); 
                 return;
             } 
             snake.Move(nextTile);
