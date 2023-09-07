@@ -28,12 +28,9 @@ namespace Game
 
         public Tile()
         {
-            position = Vector2Int.zero;
-            tileType = TileType.Empty;
-            
         }
         
-        public Tile(Vector2Int position, GameObject tileObject, TileType tileType = TileType.Empty)
+        public Tile(Vector2Int position, GameObject tileObject = null, TileType tileType = TileType.Empty)
         {
             this.position = position;
             this.tileObject = tileObject;

@@ -20,7 +20,7 @@ namespace Game
             {
                 for (int j = 0; j < fieldHeight; j++)
                 {
-                    tiles[i, j] = new Tile();
+                    tiles[i, j] = new Tile(new Vector2Int(i,j));
                 }
             }
             //DrawField();
