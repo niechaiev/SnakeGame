@@ -18,10 +18,13 @@ namespace Game
 
         public void Update()
         {
+            var nextTile = GetNextTile(snake.Head);
+            if(nextTile!=null)
+                snake.Move(nextTile);
         }
 
         [CanBeNull]
-        private Tile GetNextCell(Tile currentPosition)
+        private Tile GetNextTile(Tile currentPosition)
         {
             int row = currentPosition.Position.x;
             int col = currentPosition.Position.y;
