@@ -21,6 +21,13 @@ namespace Game
             var nextTile = GetNextTile(snake.Head);
             if (nextTile == null || snake.CheckCrash(nextTile))
                 Debug.Log("gameover"); 
+            
+            
+            if (nextTile.TileType == TileType.Fruit) { 
+                snake.Grow(nextTile); 
+                field.GenerateFood(); 
+                return;
+            } 
             snake.Move(nextTile);
             
         }

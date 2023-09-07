@@ -15,16 +15,16 @@ namespace Game
         
         private Random random;
         private Tile[,] tiles;
-        private List<Tile> obstacles;
-        private List<Tile> fruits;
+        private List<GameObject> obstacles;
+        private List<GameObject> fruits;
 
-        public List<Tile> Obstacles
+        public List<GameObject> Obstacles
         {
             get => obstacles;
             set => obstacles = value;
         }
 
-        public List<Tile> Fruits
+        public List<GameObject> Fruits
         {
             get => fruits;
             set => fruits = value;
@@ -44,8 +44,8 @@ namespace Game
             this.maxObstaclesAmount = maxObstaclesAmount;
             this.fruitAmount = fruitAmount;
 
-            obstacles = new List<Tile>();
-            fruits = new List<Tile>();
+            obstacles = new List<GameObject>();
+            fruits = new List<GameObject>();
 
             tiles = new Tile[fieldWidth, fieldHeight];
             for (int i = 0; i < fieldWidth; i++)

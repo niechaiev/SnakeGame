@@ -88,7 +88,7 @@ namespace Game
             playerControlsUI.gameObject.SetActive(false);
             StopCoroutine(intervalCoroutine);
             snake.OnMove -= SwapTiles;
-            snake.OnGrow -= InstantiateTileObject;
+            snake.OnGrow -= PoolSnakeSegment;
             ReleasePooledObjects();
             InitializeGame();
         }
@@ -102,12 +102,12 @@ namespace Game
             
             foreach (var obstacle in field.Obstacles)
             {
-                obstaclePool.Release(obstacle.TileObject);
+                obstaclePool.Release(obstacle);
             }
 
             foreach (var fruit in field.Fruits)
             {
-                fruitPool.Release(fruit.TileObject);
+                fruitPool.Release(fruit);
             }
         }
 
@@ -116,18 +116,15 @@ namespace Game
             var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
             snake = new Snake(snakePosition, field);
             snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 1]);
-            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 2]);
-            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 3]);
-            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 4]);
-            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 5]);
 
             snake.OnMove += SwapTiles;
-            snake.OnGrow += InstantiateTileObject;
+            snake.OnGrow += PoolSnakeSegment;
         }
 
-        private void InstantiateTileObject(Tile snakeTail)
+        private void PoolSnakeSegment(Tile snakeTile)
         {
-            InstantiateTileObject(snakeTail, snakePrefab);
+            fruitPool.Release(snakeTile.TileObject);
+            snakeTile.TileObject = PoolObject(snakeTile, snakePool);
         }
 
         private void SwapTiles(Tile from, Tile to)
@@ -194,11 +191,11 @@ namespace Game
                             break;
                         case TileType.Fruit:
                             currentTile.TileObject = PoolObject(currentTile, fruitPool);
-                            field.Fruits.Add(currentTile);
+                            field.Fruits.Add(currentTile.TileObject);
                             break;
                         case TileType.Obstacle:
                             currentTile.TileObject = PoolObject(currentTile, obstaclePool);
-                            field.Obstacles.Add(currentTile);
+                            field.Obstacles.Add(currentTile.TileObject);
                             break;
                     }
                 }

@@ -46,10 +46,12 @@ namespace Game
             segments.AddLast(tile);
             tile.TileType = TileType.Snake;
         }
-        public void Grow()
+        public void Grow(Tile nextTile)
         {
-            segments.AddLast(head);
-            OnGrow.Invoke(head);
+            nextTile.TileType = TileType.Snake;
+            segments.AddFirst(nextTile);
+            head = nextTile;
+            OnGrow.Invoke(nextTile);
         }
 
         public void Move(Tile nextTile)
