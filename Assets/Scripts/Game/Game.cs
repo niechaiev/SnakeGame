@@ -19,26 +19,44 @@ namespace Game
         public void Update()
         {
             var nextTile = GetNextTile(snake.Head);
-            if(nextTile!=null)
-                snake.Move(nextTile);
+            if (nextTile == null || snake.CheckCrash(nextTile))
+                Debug.Log("gameover"); 
+            snake.Move(nextTile);
+            
         }
+
+        public void TurnLeft()
+        {
+            direction = EnumMod(--direction, 4);
+            
+        }
+
+        public void TurnRight()
+        {
+            direction = EnumMod(++direction, 4);
+        }
+        
+        private Direction EnumMod(Direction x, int m) {
+            return (Direction)(((int)x%m + m)%m);
+        }
+       
 
         [CanBeNull]
         private Tile GetNextTile(Tile currentPosition)
         {
-            int row = currentPosition.Position.x;
-            int col = currentPosition.Position.y;
+            int col = currentPosition.Position.x;
+            int row = currentPosition.Position.y;
 
             switch (direction)
             {
                 case Direction.Up:
-                    row--;
+                    row++;
                     break;
                 case Direction.Right:
                     col++;
                     break;
                 case Direction.Down:
-                    row++;
+                    row--;
                     break;
                 case Direction.Left:
                     col--;
@@ -50,7 +68,7 @@ namespace Game
             if (row < 0 || col < 0 || row >= field.Tiles.GetLength(0) || col >= field.Tiles.GetLength(1))
                 return null;
 
-            var nextCell = field.Tiles[row, col];
+            var nextCell = field.Tiles[col, row];
             return nextCell;
         }
     }

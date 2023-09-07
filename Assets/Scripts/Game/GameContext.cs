@@ -1,14 +1,23 @@
+using System;
 using System.Collections;
+using UI;
 using UnityEngine;
+using UnityEngine.Pool;
+using UnityEngine.Serialization;
 
 namespace Game
 {
     public class GameContext : MonoBehaviour
     {
         [SerializeField] private GameObject emptyTilePrefab;
-        [SerializeField] private GameObject snakeTilePrefab;
+        [SerializeField] private GameObject snakePrefab;
+        [SerializeField] private GameObject obstaclePrefab;
+        [SerializeField] private GameObject fruitPrefab;
+
         [SerializeField] private GameObject gameCamera;
         [SerializeField] private GameObject tilesParent;
+
+        [SerializeField] private PlayerControlsUI playerControlsUI;
 
         private readonly int fieldWidth = 20;
         private readonly int fieldHeight = 20;
@@ -21,19 +30,104 @@ namespace Game
         private Field field;
         private Game game;
 
-        private void Start()
+        private ObjectPool<GameObject> snakePool;
+        private ObjectPool<GameObject> obstaclePool;
+        private ObjectPool<GameObject> fruitPool;
+
+
+        private Coroutine intervalCoroutine;
+
+        public Game Game
+        {
+            get => game;
+            set => game = value;
+        }
+
+        private void Awake()
         {
             Application.targetFrameRate = 60;
-
+            PopulatePools();
             RecenterCamera();
-            field = new Field(fieldWidth, fieldHeight);
+            InitializeGame();
+        }
 
-            var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
-            snake = new Snake(snakePosition, snakeStartingSize, field);
-            snake.Swap += SwapTiles;
-            game = new Game(snake, field);
+        private void PopulatePools()
+        {
+            snakePool = new ObjectPool<GameObject>(() => { return Instantiate(snakePrefab); },
+                snakeSegment => { snakeSegment.gameObject.SetActive(true); },
+                snakeSegment => { snakeSegment.gameObject.SetActive(false); },
+                snakeSegment => { Destroy(snakeSegment.gameObject); }, false, 10, 10);
+
+            obstaclePool = new ObjectPool<GameObject>(() => { return Instantiate(obstaclePrefab); },
+                obstacle => { obstacle.gameObject.SetActive(true); },
+                obstacle => { obstacle.gameObject.SetActive(false); },
+                obstacle => { Destroy(obstacle.gameObject); }, false, 5, 5);
+
+            fruitPool = new ObjectPool<GameObject>(() => { return Instantiate(fruitPrefab); },
+                fruit => { fruit.gameObject.SetActive(true); },
+                fruit => { fruit.gameObject.SetActive(false); },
+                fruit => { Destroy(fruit.gameObject); }, false, 1, 1);
+        }
+
+        private void Start()
+        {
             DrawEmptyTiles(field.Tiles);
-            StartCoroutine(Interval());
+        }
+
+        public void InitializeGame()
+        {
+            field = new Field(fieldWidth, fieldHeight,3,5,1);
+            InitializeSnake();
+            game = new Game(snake, field);
+            intervalCoroutine = StartCoroutine(Interval());
+            playerControlsUI.gameObject.SetActive(true);
+        }
+
+        public void RestartGame()
+        {
+            playerControlsUI.gameObject.SetActive(false);
+            StopCoroutine(intervalCoroutine);
+            snake.OnMove -= SwapTiles;
+            snake.OnGrow -= InstantiateTileObject;
+            ReleasePooledObjects();
+            InitializeGame();
+        }
+
+        private void ReleasePooledObjects()
+        {
+            foreach (var snakeSegment in snake.Segments)
+            {
+                snakePool.Release(snakeSegment.TileObject);
+            }
+            
+            foreach (var obstacle in field.Obstacles)
+            {
+                obstaclePool.Release(obstacle.TileObject);
+            }
+
+            foreach (var fruit in field.Fruits)
+            {
+                fruitPool.Release(fruit.TileObject);
+            }
+        }
+
+        private void InitializeSnake()
+        {
+            var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
+            snake = new Snake(snakePosition, field);
+            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 1]);
+            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 2]);
+            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 3]);
+            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 4]);
+            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 5]);
+
+            snake.OnMove += SwapTiles;
+            snake.OnGrow += InstantiateTileObject;
+        }
+
+        private void InstantiateTileObject(Tile snakeTail)
+        {
+            InstantiateTileObject(snakeTail, snakePrefab);
         }
 
         private void SwapTiles(Tile from, Tile to)
@@ -41,10 +135,6 @@ namespace Game
             to.TileObject = from.TileObject;
             from.TileObject = null;
             to.TileObject.transform.position = GetObjectPosition(to);
-        }
-
-        private void Update()
-        {
         }
 
         IEnumerator Interval()
@@ -57,7 +147,6 @@ namespace Game
                 DrawTiles(field.Tiles);
             }
         }
-
 
         private Vector3 GetObjectPosition(Tile tile)
         {
@@ -94,24 +183,27 @@ namespace Game
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
                     var currentTile = tiles[i, j];
-                    
+
                     if (currentTile.TileObject != null)
                         continue;
-                    
+
                     switch (currentTile.TileType)
                     {
-                        case TileType.Snake: 
-                            currentTile.TileObject = InstantiateTileObject(currentTile, snakeTilePrefab);
+                        case TileType.Snake:
+                            currentTile.TileObject = PoolObject(currentTile, snakePool);
                             break;
                         case TileType.Fruit:
+                            currentTile.TileObject = PoolObject(currentTile, fruitPool);
+                            field.Fruits.Add(currentTile);
                             break;
                         case TileType.Obstacle:
+                            currentTile.TileObject = PoolObject(currentTile, obstaclePool);
+                            field.Obstacles.Add(currentTile);
                             break;
                     }
                 }
             }
         }
-        
         private GameObject InstantiateTileObject(Tile tile, GameObject prefab)
         {
             var tileObject = Instantiate(prefab, GetObjectPosition(tile),
@@ -119,5 +211,13 @@ namespace Game
             tileObject.transform.parent = tilesParent.transform;
             return tileObject;
         }
+
+        private GameObject PoolObject(Tile tile, ObjectPool<GameObject> pool) 
+        {
+            var pooledObject = pool.Get();
+            pooledObject.transform.position = GetObjectPosition(tile);
+            return pooledObject;
+        }
+        
     }
 }

@@ -8,7 +8,8 @@ namespace Game
         private LinkedList<Tile> segments;
         private Tile head;
         private Field field;
-        public Action<Tile, Tile> Swap;
+        public Action<Tile, Tile> OnMove;
+        public Action<Tile> OnGrow;
 
         public LinkedList<Tile> Segments
         {
@@ -22,18 +23,33 @@ namespace Game
             set => head = value;
         }
 
-        public Snake(Tile position, int startSize, Field field)
+        public Snake(Tile position, Field field)
         {
             head = position;
             segments = new LinkedList<Tile>();
-            segments.AddLast(head);
-            position.TileType = TileType.Snake;
+            AddSegment(head);
             this.field = field;
         }
+        
+        public bool CheckCrash(Tile nextTile) 
+        {
+            foreach (var tile in segments)
+            {
+                if (tile == nextTile)
+                    return true;
+            }
+            return false; 
+        } 
 
+        public void AddSegment(Tile tile)
+        {
+            segments.AddLast(tile);
+            tile.TileType = TileType.Snake;
+        }
         public void Grow()
         {
             segments.AddLast(head);
+            OnGrow.Invoke(head);
         }
 
         public void Move(Tile nextTile)
@@ -46,9 +62,7 @@ namespace Game
             head.TileType = TileType.Snake;
             segments.AddFirst(head);
 
-            Swap(tail, head);
-            
-
+            OnMove.Invoke(tail, head);
         }
     }
 }
