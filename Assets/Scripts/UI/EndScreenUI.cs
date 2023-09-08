@@ -11,7 +11,7 @@ namespace UI
         [SerializeField] private CanvasGroup endScreen; 
         [SerializeField] private TMP_Text tmpText;
         [SerializeField] private Button restartButton;
-        [SerializeField] private GameContext gameContext;
+        [FormerlySerializedAs("gameContext")] [SerializeField] private GameVisualizer gameVisualizer;
         
 
         private void Start()
@@ -21,7 +21,7 @@ namespace UI
 
         private void RestartButtonPressed()
         {
-            gameContext.RestartGame();
+            gameVisualizer.RestartGame();
         }
         
         public void ShowGameOverScreen(bool state)

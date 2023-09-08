@@ -1,6 +1,7 @@
 using System;
 using Game;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -9,18 +10,18 @@ namespace UI
     {
         [SerializeField] private Button leftButton;
         [SerializeField] private Button rightButton;
-        [SerializeField] private GameContext gameContext;
+        [FormerlySerializedAs("gameContext")] [SerializeField] private GameVisualizer gameVisualizer;
 
         private void OnEnable()
         {
-            leftButton.onClick.AddListener(gameContext.Game.TurnLeft);
-            rightButton.onClick.AddListener(gameContext.Game.TurnRight);
+            leftButton.onClick.AddListener(gameVisualizer.Game.TurnLeft);
+            rightButton.onClick.AddListener(gameVisualizer.Game.TurnRight);
         }
 
         private void OnDisable()
         {
-            leftButton.onClick.RemoveListener(gameContext.Game.TurnLeft);
-            rightButton.onClick.RemoveListener(gameContext.Game.TurnRight);
+            leftButton.onClick.RemoveListener(gameVisualizer.Game.TurnLeft);
+            rightButton.onClick.RemoveListener(gameVisualizer.Game.TurnRight);
         }
     }
 }

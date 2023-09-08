@@ -5,7 +5,7 @@ namespace Game
 {
     public class ObjectPools
     {
-        private GameContext gameContext;
+        private GameVisualizer gameVisualizer;
         private ObjectPool<GameObject> snakePool;
         private ObjectPool<GameObject> obstaclePool;
         private ObjectPool<GameObject> fruitPool;
@@ -20,9 +20,9 @@ namespace Game
 
         public ObjectPool<GameObject> FruitPool => fruitPool;
 
-        public ObjectPools(GameContext gameContext, GameObject snakePrefab, GameObject obstaclePrefab, GameObject fruitPrefab)
+        public ObjectPools(GameVisualizer gameVisualizer, GameObject snakePrefab, GameObject obstaclePrefab, GameObject fruitPrefab)
         {
-            this.gameContext = gameContext;
+            this.gameVisualizer = gameVisualizer;
             this.snakePrefab = snakePrefab;
             this.obstaclePrefab = obstaclePrefab;
             this.fruitPrefab = fruitPrefab;
@@ -50,17 +50,17 @@ namespace Game
         
         public void ReleasePoolObjects()
         {
-            foreach (var snakeSegment in gameContext.Snake.Segments)
+            foreach (var snakeSegment in gameVisualizer.Snake.Segments)
             {
                 snakePool.Release(snakeSegment.TileObject);
             }
             
-            foreach (var obstacle in gameContext.Field.Obstacles)
+            foreach (var obstacle in gameVisualizer.Field.Obstacles)
             {
                 obstaclePool.Release(obstacle);
             }
 
-            foreach (var fruit in gameContext.Field.Fruits)
+            foreach (var fruit in gameVisualizer.Field.Fruits)
             {
                 fruitPool.Release(fruit);
             }

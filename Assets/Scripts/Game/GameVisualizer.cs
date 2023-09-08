@@ -1,13 +1,11 @@
-using System;
 using System.Collections;
 using UI;
 using UnityEngine;
 using UnityEngine.Pool;
-using UnityEngine.Serialization;
 
 namespace Game
 {
-    public class GameContext : MonoBehaviour
+    public class GameVisualizer : MonoBehaviour
     {
         [SerializeField] private GameObject emptyTilePrefab;
         [SerializeField] private GameObject snakePrefab;
@@ -20,10 +18,14 @@ namespace Game
 
         private readonly int fieldWidth = 20;
         private readonly int fieldHeight = 20;
+        private readonly int snakeStartingLength = 2;
+        private readonly float growSpeedGain = 0.05f;
+        private readonly int maxSnakeLength = 10;
+        
         private readonly float spacing = 1.1f;
-        private readonly int snakeStartingSize = 2;
-        private readonly float snakeSpeed = 0.5f;
         private readonly float cameraOffset = -0.5f;
+        
+        private float snakeSpeed = 0.5f;
         
         private ObjectPools objectPools;
         private Coroutine intervalCoroutine;
@@ -89,7 +91,10 @@ namespace Game
         {
             var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
             snake = new Snake(snakePosition, field, SwapTiles, GrowSnake);
-            snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 1]);
+            for (int i = 1; i < snakeStartingLength; i++)
+            {
+                snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - i]);
+            }
         }
         
         private void SwapTiles(Tile from, Tile to)
@@ -103,6 +108,7 @@ namespace Game
             field.Fruits.Remove(snakeTile.TileObject);
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
+            snakeSpeed -= growSpeedGain;
         }
         IEnumerator Interval()
         {

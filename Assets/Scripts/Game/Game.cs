@@ -77,8 +77,8 @@ namespace Game
             if (row < 0 || col < 0 || row >= field.Tiles.GetLength(0) || col >= field.Tiles.GetLength(1))
                 return null;
 
-            var nextCell = field.Tiles[col, row];
-            return nextCell;
+            var nextTile = field.Tiles[col, row];
+            return nextTile;
         }
     }
 }
