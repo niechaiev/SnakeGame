@@ -338,7 +338,7 @@ MonoBehaviour:
   obstaclePrefab: {fileID: 476563579484737901, guid: 1f7a58b1b64bdc44e9674316ad8e0462, type: 3}
   fruitPrefab: {fileID: 476563579484737901, guid: 716e18e5d7cc8574bbf6bdbeca7287f8, type: 3}
   gameCamera: {fileID: 963194225}
-  tilesParent: {fileID: 390638111}
+  emptyTilesParent: {fileID: 390638111}
   playerControlsUI: {fileID: 1769461537}
 --- !u!1 &705507993
 GameObject:
