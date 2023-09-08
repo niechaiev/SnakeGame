@@ -14,8 +14,8 @@ namespace Game
 
         [SerializeField] private GameObject gameCamera;
         [SerializeField] private GameObject emptyTilesParent;
+        
         [SerializeField] private PlayerControlsUI playerControlsUI;
-
         [SerializeField] private EndScreenUI endScreenUI;
         [SerializeField] private CounterScreenUI counterScreenUI;
 
@@ -84,7 +84,7 @@ namespace Game
             playerControlsUI.gameObject.SetActive(false);
             StopCoroutine(intervalCoroutine);
             field.UnSubscribe(AddFruitReferences);
-            snake.UnSubscribe(SwapTiles, GrowSnake);
+            snake.UnSubscribe(SwapTiles, GrowSnake, counterScreenUI.UpdateCount);
         }
 
         private void AddFruitReferences(Tile fruitTile)
@@ -137,6 +137,7 @@ namespace Game
             {
                 yield return new WaitForSeconds(snake.Speed);
                 game.NextStep();
+                playerControlsUI.EnableControls(true);
             }
         }
 

@@ -20,9 +20,9 @@ namespace Game
         private readonly List<GameObject> fruits;
         public int Width => width;
         public int Height => height;
+        public Tile[,] Tiles => tiles;
         public List<GameObject> Obstacles => obstacles;
         public List<GameObject> Fruits => fruits;
-        public Tile[,] Tiles => tiles;
         
         private Action<Tile> onGenerateFruit;
 

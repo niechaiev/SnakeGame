@@ -21,20 +21,12 @@ namespace Game
 
         private LinkedList<Tile> segments;
         private Tile head;
+        public LinkedList<Tile> Segments => segments;
+        public Tile Head => head;
+        
         private Action<Tile, Tile> onMove;
         private Action<Tile> onGrow;
         private Action<int> onSizeChanged;
-        public LinkedList<Tile> Segments
-        {
-            get => segments;
-            set => segments = value;
-        }
-
-        public Tile Head
-        {
-            get => head;
-            set => head = value;
-        }
 
         public Snake(Tile position, Action<Tile, Tile> onMove, Action<Tile> onGrow, Action<int> onSizeChanged)
         {
@@ -44,14 +36,15 @@ namespace Game
 
             this.onMove += onMove;
             this.onGrow += onGrow;
-            this.onSizeChanged = onSizeChanged;
+            this.onSizeChanged += onSizeChanged;
         }
 
         public void UnSubscribe(Action<Tile, Tile> onMove,
-            Action<Tile> onGrow)
+            Action<Tile> onGrow, Action<int> onSizeChanged)
         {
             this.onMove -= onMove;
             this.onGrow -= onGrow;
+            this.onSizeChanged -= onSizeChanged;
         }
 
         public bool CheckSelfCrash(Tile nextTile)
@@ -61,7 +54,7 @@ namespace Game
                 if (tile == nextTile)
                     return true;
             }
-
+            
             return false;
         }
 
