@@ -18,9 +18,12 @@ namespace Game
 
         [SerializeField] private EndScreenUI endScreenUI;
         [SerializeField] private CounterScreenUI counterScreenUI;
+
+        [SerializeField] private AudioClip fruitSound;
+        [SerializeField] private AudioClip winSound;
+        [SerializeField] private AudioClip loseSound;
+        [SerializeField] private AudioSource audioSource;
         
-
-
         private readonly float spacing = 1.1f;
         private readonly float cameraOffset = -0.5f;
 
@@ -99,9 +102,15 @@ namespace Game
         private void EndGame(bool haveWon)
         {
             if (haveWon)
+            {
                 endScreenUI.ShowVictoryScreen();
+                audioSource.PlayOneShot(winSound);
+            }
             else
+            {
                 endScreenUI.ShowDefeatScreen();
+                audioSource.PlayOneShot(loseSound);
+            }
 
             StopGame();
         }
@@ -119,6 +128,7 @@ namespace Game
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
             snake.Speed -= snake.GrowSpeedGain;
+            audioSource.PlayOneShot(fruitSound);
         }
 
         IEnumerator Interval()

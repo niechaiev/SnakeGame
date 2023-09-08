@@ -5,7 +5,7 @@ namespace Game
 {
     public class Snake
     {
-        private readonly int startingLength = 7;
+        private readonly int startingLength = 2;
         private readonly float growSpeedGain = 0.05f;
         private readonly int maxLength = 10;
         private float speed = 0.5f;

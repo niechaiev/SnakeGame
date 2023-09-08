@@ -16,13 +16,13 @@ namespace Game
             this.snake = snake;
             this.field = field;
             this.onEnd = onEnd;
-
-            field.GenerateFruit();
             
             for (int i = 1; i < snake.StartingLength; i++)
             {
                 snake.AddSegment(field.Tiles[field.Width / 2, field.Height / 2 - i]);
             }
+            
+            field.GenerateFruit();
         }
 
         public void NextStep()
