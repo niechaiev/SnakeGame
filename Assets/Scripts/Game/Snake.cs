@@ -5,6 +5,9 @@ namespace Game
 {
     public class Snake
     {
+        private readonly int startingLength = 2;
+        public int StartingLength => startingLength;
+
         private LinkedList<Tile> segments;
         private Tile head;
         private Field field;
@@ -29,6 +32,9 @@ namespace Game
             head = position;
             segments = new LinkedList<Tile>();
             AddSegment(head);
+            
+
+            
             this.field = field;
             this.onMove += onMove;
             this.onGrow += onGrow;

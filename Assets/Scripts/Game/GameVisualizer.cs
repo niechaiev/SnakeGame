@@ -16,9 +16,6 @@ namespace Game
         [SerializeField] private GameObject emptyTilesParent;
         [SerializeField] private PlayerControlsUI playerControlsUI;
 
-        private readonly int fieldWidth = 20;
-        private readonly int fieldHeight = 20;
-        private readonly int snakeStartingLength = 2;
         private readonly float growSpeedGain = 0.05f;
         private readonly int maxSnakeLength = 10;
         
@@ -42,8 +39,9 @@ namespace Game
         {
             Application.targetFrameRate = 60;
             objectPools = new ObjectPools(this, snakePrefab, obstaclePrefab, fruitPrefab);
-            RecenterCamera();
+            
             InitializeGame();
+            RecenterCamera();
             InstantiateEmptyTiles(field.Tiles);
         }
         
@@ -52,18 +50,16 @@ namespace Game
             var offsetSpacingMultiply = cameraOffset * spacing;
 
             var cameraTransform = new Vector3(
-                offsetSpacingMultiply + fieldWidth / 2f * spacing,
-                fieldWidth * 2 * spacing,
-                offsetSpacingMultiply + fieldHeight / 2f * spacing);
+                offsetSpacingMultiply + field.Width / 2f * spacing,
+                field.Width * 2 * spacing,
+                offsetSpacingMultiply + field.Height / 2f * spacing);
 
             gameCamera.transform.position = cameraTransform;
         }
 
         private void InitializeGame()
         {
-            field = new Field(fieldWidth, fieldHeight,
-                3,5,1,
-                AddFruitReferences);
+            field = new Field(AddFruitReferences);
             
             InitializeSnake();
             game = new Game(snake, field);
@@ -89,12 +85,8 @@ namespace Game
         
         private void InitializeSnake()
         {
-            var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
+            var snakePosition = field.Tiles[field.Width / 2, field.Height / 2];
             snake = new Snake(snakePosition, field, SwapTiles, GrowSnake);
-            for (int i = 1; i < snakeStartingLength; i++)
-            {
-                snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - i]);
-            }
         }
         
         private void SwapTiles(Tile from, Tile to)
@@ -109,6 +101,7 @@ namespace Game
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
             snakeSpeed -= growSpeedGain;
+            
         }
         IEnumerator Interval()
         {

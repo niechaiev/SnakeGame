@@ -11,7 +11,7 @@ namespace UI
         [SerializeField] private CanvasGroup endScreen; 
         [SerializeField] private TMP_Text tmpText;
         [SerializeField] private Button restartButton;
-        [FormerlySerializedAs("gameContext")] [SerializeField] private GameVisualizer gameVisualizer;
+        [SerializeField] private GameVisualizer gameVisualizer;
         
 
         private void Start()

@@ -10,7 +10,7 @@ namespace UI
     {
         [SerializeField] private Button leftButton;
         [SerializeField] private Button rightButton;
-        [FormerlySerializedAs("gameContext")] [SerializeField] private GameVisualizer gameVisualizer;
+        [SerializeField] private GameVisualizer gameVisualizer;
 
         private void OnEnable()
         {

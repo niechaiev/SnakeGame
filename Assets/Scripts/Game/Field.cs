@@ -8,57 +8,40 @@ namespace Game
 {
     public class Field
     {
-        private readonly int fieldWidth;
-        private readonly int fieldHeight;
-        private readonly int minObstaclesAmount;
-        private readonly int maxObstaclesAmount;
-        private int fruitAmount;
+        private readonly int width = 20;
+        private readonly int height = 20;
+        private readonly int minObstaclesAmount = 3;
+        private readonly int maxObstaclesAmount = 5;
+        private readonly int fruitAmount = 1;
         
-        private Random random;
-        private Tile[,] tiles;
-        private List<GameObject> obstacles;
-        private List<GameObject> fruits;
+        private readonly Random random;
+        private readonly Tile[,] tiles;
+        private readonly List<GameObject> obstacles;
+        private readonly List<GameObject> fruits;
+        public int Width => width;
+        public int Height => height;
+        public List<GameObject> Obstacles => obstacles;
+        public List<GameObject> Fruits => fruits;
+        public Tile[,] Tiles => tiles;
         
-        public Action<Tile> OnGenerateFruit;
+        private Action<Tile> onGenerateFruit;
 
-        public List<GameObject> Obstacles
+        public Field(Action<Tile> onGenerateFruit)
         {
-            get => obstacles;
-            set => obstacles = value;
-        }
-
-        public List<GameObject> Fruits
-        {
-            get => fruits;
-            set => fruits = value;
-        }
-        
-        public Tile[,] Tiles
-        {
-            get => tiles;
-            set => tiles = value;
-        }
-
-        public Field(int fieldWidth, int fieldHeight, int minObstaclesAmount, int maxObstaclesAmount, int fruitAmount, Action<Tile> onGenerateFruit)
-        {
-            this.fieldWidth = fieldWidth;
-            this.fieldHeight = fieldHeight;
-            this.minObstaclesAmount = minObstaclesAmount;
-            this.maxObstaclesAmount = maxObstaclesAmount;
-            this.fruitAmount = fruitAmount;
-            OnGenerateFruit += onGenerateFruit;
+            this.onGenerateFruit += onGenerateFruit;
 
             obstacles = new List<GameObject>();
             fruits = new List<GameObject>();
 
-            tiles = new Tile[fieldWidth, fieldHeight];
-            for (int i = 0; i < fieldWidth; i++)
+            tiles = new Tile[width, height];
+            for (int i = 0; i < width; i++)
             {
-                for (int j = 0; j < fieldHeight; j++)
+                for (int j = 0; j < height; j++)
                 {
-                    tiles[i, j] = new Tile(new Vector2Int(i,j));
+                    tiles[i, j] = new Tile(new Vector2Int(i, j));
                 }
             }
+
             random = new Random();
 
             GenerateObstacles();
@@ -66,42 +49,39 @@ namespace Game
 
         public void UnSubscribe(Action<Tile> onGenerateFruit)
         {
-            OnGenerateFruit -= onGenerateFruit;
+            this.onGenerateFruit -= onGenerateFruit;
         }
 
-        public void InitializeField()
+        public void GenerateFruit()
         {
-            
-        }
-        
-        public void GenerateFruit() 
-        { 
             for (int i = 0; i < fruitAmount; i++)
             {
-                int row = random.Next(0, fieldHeight); 
-                int column = random.Next(0, fieldWidth);
+                int row = random.Next(0, height);
+                int column = random.Next(0, width);
                 if (tiles[column, row].TileType != TileType.Empty)
                 {
                     i--;
                     continue;
                 }
+
                 tiles[column, row].TileType = TileType.Fruit;
-                OnGenerateFruit.Invoke(tiles[column, row]);
+                onGenerateFruit.Invoke(tiles[column, row]);
             }
         }
 
-        public void GenerateObstacles()
+        private void GenerateObstacles()
         {
             int obstaclesAmount = random.Next(minObstaclesAmount, maxObstaclesAmount);
             for (int i = 0; i < obstaclesAmount; i++)
             {
-                int row = random.Next(0, fieldHeight); 
-                int column = random.Next(0, fieldWidth);
+                int row = random.Next(0, height);
+                int column = random.Next(0, width);
                 if (tiles[column, row].TileType != TileType.Empty)
                 {
                     i--;
                     continue;
                 }
+
                 tiles[column, row].TileType = TileType.Obstacle;
             }
         }
