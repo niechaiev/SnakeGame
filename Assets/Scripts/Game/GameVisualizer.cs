@@ -15,9 +15,14 @@ namespace Game
         [SerializeField] private GameObject gameCamera;
         [SerializeField] private GameObject emptyTilesParent;
         [SerializeField] private PlayerControlsUI playerControlsUI;
+
+        private readonly float growSpeedGain = 0.05f;
+        private readonly int maxSnakeLength = 10;
         
         private readonly float spacing = 1.1f;
         private readonly float cameraOffset = -0.5f;
+        
+        private float snakeSpeed = 0.5f;
         
         private ObjectPools objectPools;
         private Coroutine intervalCoroutine;
@@ -55,29 +60,23 @@ namespace Game
         private void InitializeGame()
         {
             field = new Field(AddFruitReferences);
-            InitializeSnake();
-            game = new Game(snake, field, EndGame);
-            DrawTiles(field.Tiles);
             
+            InitializeSnake();
+            game = new Game(snake, field);
             intervalCoroutine = StartCoroutine(Interval());
             playerControlsUI.gameObject.SetActive(true);
         }
 
         public void RestartGame()
         {
-            StopGame();
-            objectPools.ReleasePoolObjects();
-            InitializeGame();
-        }
-
-        private void StopGame()
-        {
             playerControlsUI.gameObject.SetActive(false);
             StopCoroutine(intervalCoroutine);
             field.UnSubscribe(AddFruitReferences);
             snake.UnSubscribe(SwapTiles, GrowSnake);
+            objectPools.ReleasePoolObjects();
+            InitializeGame();
         }
-
+        
         private void AddFruitReferences(Tile fruitTile)
         {
             fruitTile.TileObject = DrawObjectFromPool(fruitTile, objectPools.FruitPool);
@@ -89,13 +88,7 @@ namespace Game
             var snakePosition = field.Tiles[field.Width / 2, field.Height / 2];
             snake = new Snake(snakePosition, field, SwapTiles, GrowSnake);
         }
-
-        private void EndGame(bool haveWon)
-        {
-            Debug.Log("end game");
-            StopGame();
-        }
-
+        
         private void SwapTiles(Tile from, Tile to)
         {
             to.TileObject = from.TileObject;
@@ -107,15 +100,16 @@ namespace Game
             field.Fruits.Remove(snakeTile.TileObject);
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
-            snake.Speed -= snake.GrowSpeedGain;
+            snakeSpeed -= growSpeedGain;
             
         }
         IEnumerator Interval()
         {
+            DrawTiles(field.Tiles);
             while (true)
             {
-                yield return new WaitForSeconds(snake.Speed);
-                game.NextStep();
+                yield return new WaitForSeconds(snakeSpeed);
+                game.Update();
             }
         }
 
