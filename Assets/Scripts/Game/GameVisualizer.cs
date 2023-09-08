@@ -23,7 +23,7 @@ namespace Game
         [SerializeField] private AudioClip winSound;
         [SerializeField] private AudioClip loseSound;
         [SerializeField] private AudioSource audioSource;
-        
+
         private readonly float spacing = 1.1f;
         private readonly float cameraOffset = -0.5f;
 
@@ -54,8 +54,8 @@ namespace Game
 
             var cameraTransform = new Vector3(
                 offsetSpacingMultiply + field.Width / 2f * spacing,
-                field.Width * 2 * spacing,
-                offsetSpacingMultiply + field.Height / 2f * spacing);
+                field.Width * 2 * spacing * Screen.height / Screen.width / 2.1f,
+                offsetSpacingMultiply + field.Height / 2f * spacing - 5);
 
             gameCamera.transform.position = cameraTransform;
         }
