@@ -1,7 +1,6 @@
 using Game;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -12,8 +11,10 @@ namespace UI
         [SerializeField] private TMP_Text tmpText;
         [SerializeField] private Button restartButton;
         [SerializeField] private GameVisualizer gameVisualizer;
+        [SerializeField] private Color defeatColor;
+        [SerializeField] private Color victoryColor;
+        [SerializeField] private Image backgroundImage;
         
-
         private void Start()
         {
             restartButton.onClick.AddListener(RestartButtonPressed);
@@ -24,17 +25,28 @@ namespace UI
             gameVisualizer.RestartGame();
         }
         
-        public void ShowGameOverScreen(bool state)
+        public void ShowDefeatScreen()
         {
             tmpText.text = "DEFEAT";
-            endScreen.enabled = state;
-            
+            ShowCanvasGroup(true);
+            backgroundImage.color = defeatColor;
         }
 
-        public void ShowVictoryScreen(bool state)
+        public void ShowVictoryScreen()
         {
             tmpText.text = "VICTORY";
-            endScreen.enabled = state;
+            ShowCanvasGroup(true);
+            backgroundImage.color = victoryColor;
+        }
+        private void ShowCanvasGroup(bool state)
+        {
+            endScreen.alpha = state ? 1: 0;
+            endScreen.interactable = state;
+            endScreen.blocksRaycasts = state;
+        }
+        public void HideEndScreen()
+        {
+            ShowCanvasGroup(false);
         }
 
         private void OnDestroy()

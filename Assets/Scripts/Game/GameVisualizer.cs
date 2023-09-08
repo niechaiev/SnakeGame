@@ -11,17 +11,20 @@ namespace Game
         [SerializeField] private GameObject snakePrefab;
         [SerializeField] private GameObject obstaclePrefab;
         [SerializeField] private GameObject fruitPrefab;
-        
+
         [SerializeField] private GameObject gameCamera;
         [SerializeField] private GameObject emptyTilesParent;
         [SerializeField] private PlayerControlsUI playerControlsUI;
-        
+
+        [SerializeField] private EndScreenUI endScreenUI;
+
+
         private readonly float spacing = 1.1f;
         private readonly float cameraOffset = -0.5f;
-        
+
         private ObjectPools objectPools;
         private Coroutine intervalCoroutine;
-        
+
         private Snake snake;
         private Field field;
         private Game game;
@@ -34,12 +37,12 @@ namespace Game
         {
             Application.targetFrameRate = 60;
             objectPools = new ObjectPools(this, snakePrefab, obstaclePrefab, fruitPrefab);
-            
+
             InitializeGame();
             RecenterCamera();
             InstantiateEmptyTiles(field.Tiles);
         }
-        
+
         private void RecenterCamera()
         {
             var offsetSpacingMultiply = cameraOffset * spacing;
@@ -58,9 +61,10 @@ namespace Game
             InitializeSnake();
             game = new Game(snake, field, EndGame);
             DrawTiles(field.Tiles);
-            
+
             intervalCoroutine = StartCoroutine(Interval());
             playerControlsUI.gameObject.SetActive(true);
+            endScreenUI.HideEndScreen();
         }
 
         public void RestartGame()
@@ -83,7 +87,7 @@ namespace Game
             fruitTile.TileObject = DrawObjectFromPool(fruitTile, objectPools.FruitPool);
             field.Fruits.Add(fruitTile.TileObject);
         }
-        
+
         private void InitializeSnake()
         {
             var snakePosition = field.Tiles[field.Width / 2, field.Height / 2];
@@ -92,7 +96,11 @@ namespace Game
 
         private void EndGame(bool haveWon)
         {
-            Debug.Log("end game");
+            if (haveWon)
+                endScreenUI.ShowVictoryScreen();
+            else
+                endScreenUI.ShowDefeatScreen();
+
             StopGame();
         }
 
@@ -102,14 +110,15 @@ namespace Game
             from.TileObject = null;
             to.TileObject.transform.position = GetObjectPosition(to);
         }
+
         private void GrowSnake(Tile snakeTile)
         {
             field.Fruits.Remove(snakeTile.TileObject);
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
             snake.Speed -= snake.GrowSpeedGain;
-            
         }
+
         IEnumerator Interval()
         {
             while (true)
@@ -123,7 +132,7 @@ namespace Game
         {
             return new Vector3(tile.Position.x * spacing, 0, tile.Position.y * spacing);
         }
-        
+
         private void InstantiateEmptyTiles(Tile[,] tiles)
         {
             for (int i = 0; i < tiles.GetLength(0); i++)
@@ -165,13 +174,12 @@ namespace Game
                 }
             }
         }
-        
-        private GameObject DrawObjectFromPool(Tile tile, ObjectPool<GameObject> pool) 
+
+        private GameObject DrawObjectFromPool(Tile tile, ObjectPool<GameObject> pool)
         {
             var pooledObject = pool.Get();
             pooledObject.transform.position = GetObjectPosition(tile);
             return pooledObject;
         }
-        
     }
 }

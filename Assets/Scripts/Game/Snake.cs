@@ -57,7 +57,7 @@ namespace Game
             this.onGrow -= onGrow;
         }
         
-        public bool CheckCrash(Tile nextTile) 
+        public bool CheckSelfCrash(Tile nextTile) 
         {
             foreach (var tile in segments)
             {

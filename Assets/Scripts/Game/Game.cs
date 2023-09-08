@@ -28,12 +28,16 @@ namespace Game
         public void NextStep()
         {
             var nextTile = GetNextTile(snake.Head);
-            if (nextTile == null || snake.CheckCrash(nextTile))
+            if (nextTile == null || snake.CheckSelfCrash(nextTile))
             {
                 onEnd.Invoke(false);
                 return;
             }
-
+            if (nextTile.TileType == TileType.Obstacle)
+            {
+                onEnd.Invoke(false);
+                return;
+            }
             if (nextTile.TileType == TileType.Fruit) { 
                 snake.Grow(nextTile);
                 if (snake.Segments.Count == snake.MaxLength)
