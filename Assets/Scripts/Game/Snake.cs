@@ -5,14 +5,26 @@ namespace Game
 {
     public class Snake
     {
-        private readonly int startingLength = 2;
+        private readonly int startingLength = 9;
+        private readonly float growSpeedGain = 0.05f;
+        private readonly int maxLength = 10;
+        private float speed = 0.5f;
         public int StartingLength => startingLength;
+        public float GrowSpeedGain => growSpeedGain;
+        public int MaxLength => maxLength;
+        public float Speed
+        {
+            get => speed;
+            set => speed = value;
+        }
 
         private LinkedList<Tile> segments;
         private Tile head;
         private Field field;
         private Action<Tile, Tile> onMove;
         private Action<Tile> onGrow;
+        
+
 
         public LinkedList<Tile> Segments
         {
@@ -32,8 +44,6 @@ namespace Game
             head = position;
             segments = new LinkedList<Tile>();
             AddSegment(head);
-            
-
             
             this.field = field;
             this.onMove += onMove;

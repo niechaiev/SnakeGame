@@ -9,12 +9,14 @@ namespace Game
         private Snake snake;
         private Field field;
         private Direction direction;
+        private Action<bool> onEnd;
 
-        public Game(Snake snake, Field field)
+        public Game(Snake snake, Field field, Action<bool> onEnd)
         {
             this.snake = snake;
             this.field = field;
-            
+            this.onEnd = onEnd;
+
             field.GenerateFruit();
             
             for (int i = 1; i < snake.StartingLength; i++)
@@ -23,15 +25,22 @@ namespace Game
             }
         }
 
-        public void Update()
+        public void NextStep()
         {
             var nextTile = GetNextTile(snake.Head);
             if (nextTile == null || snake.CheckCrash(nextTile))
-                Debug.Log("gameover"); 
-            
-            
+            {
+                onEnd.Invoke(false);
+                return;
+            }
+
             if (nextTile.TileType == TileType.Fruit) { 
-                snake.Grow(nextTile); 
+                snake.Grow(nextTile);
+                if (snake.Segments.Count == snake.MaxLength)
+                {
+                    onEnd.Invoke(true);
+                    return;
+                }
                 field.GenerateFruit(); 
                 return;
             } 
