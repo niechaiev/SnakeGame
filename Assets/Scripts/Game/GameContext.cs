@@ -33,8 +33,7 @@ namespace Game
         private ObjectPool<GameObject> snakePool;
         private ObjectPool<GameObject> obstaclePool;
         private ObjectPool<GameObject> fruitPool;
-
-
+        
         private Coroutine intervalCoroutine;
 
         public Game Game
@@ -49,6 +48,7 @@ namespace Game
             PopulatePools();
             RecenterCamera();
             InitializeGame();
+            InstantiateEmptyTiles(field.Tiles);
         }
 
         private void PopulatePools()
@@ -68,40 +68,48 @@ namespace Game
                 fruit => { fruit.gameObject.SetActive(false); },
                 fruit => { Destroy(fruit.gameObject); }, false, 1, 1);
         }
-
-        private void Start()
+        
+        private void RecenterCamera()
         {
-            DrawEmptyTiles(field.Tiles);
+            var offsetSpacingMultiply = cameraOffset * spacing;
+
+            var cameraTransform = new Vector3(
+                offsetSpacingMultiply + fieldWidth / 2f * spacing,
+                fieldWidth * 2 * spacing,
+                offsetSpacingMultiply + fieldHeight / 2f * spacing);
+
+            gameCamera.transform.position = cameraTransform;
         }
 
-        public void InitializeGame()
+        private void InitializeGame()
         {
-            field = new Field(fieldWidth, fieldHeight,3,5,1);
-            field.OnGenerateFruit += PoolFruit;
-            field.GenerateFruit();
+            field = new Field(fieldWidth, fieldHeight,
+                3,5,1,
+                AddFruitReferences);
+            
             InitializeSnake();
             game = new Game(snake, field);
             intervalCoroutine = StartCoroutine(Interval());
             playerControlsUI.gameObject.SetActive(true);
         }
 
-        private void PoolFruit(Tile fruitTile)
-        {
-            fruitTile.TileObject = PoolObject(fruitTile, fruitPool);
-            field.Fruits.Add(fruitTile.TileObject);
-        }
-
         public void RestartGame()
         {
             playerControlsUI.gameObject.SetActive(false);
             StopCoroutine(intervalCoroutine);
-            snake.OnMove -= SwapTiles;
-            snake.OnGrow -= PoolSnakeSegment;
-            ReleasePooledObjects();
+            field.UnSubscribe(AddFruitReferences);
+            snake.UnSubscribe(SwapTiles, GrowSnake);
+            ReleasePoolObjects();
             InitializeGame();
         }
+        
+        private void AddFruitReferences(Tile fruitTile)
+        {
+            fruitTile.TileObject = DrawObjectFromPool(fruitTile, fruitPool);
+            field.Fruits.Add(fruitTile.TileObject);
+        }
 
-        private void ReleasePooledObjects()
+        private void ReleasePoolObjects()
         {
             foreach (var snakeSegment in snake.Segments)
             {
@@ -122,27 +130,22 @@ namespace Game
         private void InitializeSnake()
         {
             var snakePosition = field.Tiles[fieldWidth / 2, fieldHeight / 2];
-            snake = new Snake(snakePosition, field);
+            snake = new Snake(snakePosition, field, SwapTiles, GrowSnake);
             snake.AddSegment(field.Tiles[fieldWidth / 2, fieldHeight / 2 - 1]);
-
-            snake.OnMove += SwapTiles;
-            snake.OnGrow += PoolSnakeSegment;
         }
-
-        private void PoolSnakeSegment(Tile snakeTile)
-        {
-            field.Fruits.Remove(snakeTile.TileObject);
-            fruitPool.Release(snakeTile.TileObject);
-            snakeTile.TileObject = PoolObject(snakeTile, snakePool);
-        }
-
+        
         private void SwapTiles(Tile from, Tile to)
         {
             to.TileObject = from.TileObject;
             from.TileObject = null;
             to.TileObject.transform.position = GetObjectPosition(to);
         }
-
+        private void GrowSnake(Tile snakeTile)
+        {
+            field.Fruits.Remove(snakeTile.TileObject);
+            fruitPool.Release(snakeTile.TileObject);
+            snakeTile.TileObject = DrawObjectFromPool(snakeTile, snakePool);
+        }
         IEnumerator Interval()
         {
             DrawTiles(field.Tiles);
@@ -157,26 +160,16 @@ namespace Game
         {
             return new Vector3(tile.Position.x * spacing, 0, tile.Position.y * spacing);
         }
-
-        private void RecenterCamera()
-        {
-            var offsetSpacingMultiply = cameraOffset * spacing;
-
-            var cameraTransform = new Vector3(
-                offsetSpacingMultiply + fieldWidth / 2f * spacing,
-                fieldWidth * 2 * spacing,
-                offsetSpacingMultiply + fieldHeight / 2f * spacing);
-
-            gameCamera.transform.position = cameraTransform;
-        }
-
-        private void DrawEmptyTiles(Tile[,] tiles)
+        
+        private void InstantiateEmptyTiles(Tile[,] tiles)
         {
             for (int i = 0; i < tiles.GetLength(0); i++)
             {
                 for (int j = 0; j < tiles.GetLength(1); j++)
                 {
-                    InstantiateTileObject(tiles[i, j], emptyTilePrefab);
+                    var tileObject = Instantiate(emptyTilePrefab, GetObjectPosition(tiles[i, j]),
+                        emptyTilePrefab.transform.rotation);
+                    tileObject.transform.parent = tilesParent.transform;
                 }
             }
         }
@@ -195,29 +188,22 @@ namespace Game
                     switch (currentTile.TileType)
                     {
                         case TileType.Snake:
-                            currentTile.TileObject = PoolObject(currentTile, snakePool);
+                            currentTile.TileObject = DrawObjectFromPool(currentTile, snakePool);
                             break;
                         case TileType.Fruit:
-                            currentTile.TileObject = PoolObject(currentTile, fruitPool);
+                            currentTile.TileObject = DrawObjectFromPool(currentTile, fruitPool);
                             field.Fruits.Add(currentTile.TileObject);
                             break;
                         case TileType.Obstacle:
-                            currentTile.TileObject = PoolObject(currentTile, obstaclePool);
+                            currentTile.TileObject = DrawObjectFromPool(currentTile, obstaclePool);
                             field.Obstacles.Add(currentTile.TileObject);
                             break;
                     }
                 }
             }
         }
-        private GameObject InstantiateTileObject(Tile tile, GameObject prefab)
-        {
-            var tileObject = Instantiate(prefab, GetObjectPosition(tile),
-                prefab.transform.rotation);
-            tileObject.transform.parent = tilesParent.transform;
-            return tileObject;
-        }
-
-        private GameObject PoolObject(Tile tile, ObjectPool<GameObject> pool) 
+        
+        private GameObject DrawObjectFromPool(Tile tile, ObjectPool<GameObject> pool) 
         {
             var pooledObject = pool.Get();
             pooledObject.transform.position = GetObjectPosition(tile);

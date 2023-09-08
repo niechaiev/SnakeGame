@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using Unity.VisualScripting;
 using UnityEngine;
 using Random = System.Random;
 
@@ -38,13 +39,14 @@ namespace Game
             set => tiles = value;
         }
 
-        public Field(int fieldWidth, int fieldHeight, int minObstaclesAmount, int maxObstaclesAmount, int fruitAmount)
+        public Field(int fieldWidth, int fieldHeight, int minObstaclesAmount, int maxObstaclesAmount, int fruitAmount, Action<Tile> onGenerateFruit)
         {
             this.fieldWidth = fieldWidth;
             this.fieldHeight = fieldHeight;
             this.minObstaclesAmount = minObstaclesAmount;
             this.maxObstaclesAmount = maxObstaclesAmount;
             this.fruitAmount = fruitAmount;
+            OnGenerateFruit += onGenerateFruit;
 
             obstacles = new List<GameObject>();
             fruits = new List<GameObject>();
@@ -60,9 +62,12 @@ namespace Game
             random = new Random();
 
             GenerateObstacles();
-            //DrawField();
         }
-        
+
+        public void UnSubscribe(Action<Tile> onGenerateFruit)
+        {
+            OnGenerateFruit -= onGenerateFruit;
+        }
 
         public void InitializeField()
         {

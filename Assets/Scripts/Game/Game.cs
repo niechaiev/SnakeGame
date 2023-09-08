@@ -14,6 +14,8 @@ namespace Game
         {
             this.snake = snake;
             this.field = field;
+            
+            field.GenerateFruit();
         }
 
         public void Update()
