@@ -17,6 +17,8 @@ namespace Game
         [SerializeField] private PlayerControlsUI playerControlsUI;
 
         [SerializeField] private EndScreenUI endScreenUI;
+        [SerializeField] private CounterScreenUI counterScreenUI;
+        
 
 
         private readonly float spacing = 1.1f;
@@ -91,7 +93,7 @@ namespace Game
         private void InitializeSnake()
         {
             var snakePosition = field.Tiles[field.Width / 2, field.Height / 2];
-            snake = new Snake(snakePosition, field, SwapTiles, GrowSnake);
+            snake = new Snake(snakePosition, SwapTiles, GrowSnake, counterScreenUI.UpdateCount);
         }
 
         private void EndGame(bool haveWon)

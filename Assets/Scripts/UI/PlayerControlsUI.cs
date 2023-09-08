@@ -1,7 +1,5 @@
-using System;
 using Game;
 using UnityEngine;
-using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace UI
@@ -11,6 +9,7 @@ namespace UI
         [SerializeField] private Button leftButton;
         [SerializeField] private Button rightButton;
         [SerializeField] private GameVisualizer gameVisualizer;
+        
 
         private void OnEnable()
         {
