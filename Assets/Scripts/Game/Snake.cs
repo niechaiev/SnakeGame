@@ -6,11 +6,11 @@ namespace Game
     public class Snake
     {
         private readonly int startingLength = 2;
-        private readonly float growSpeedGain = 0.05f;
+        private readonly float growSpeedGainMultiply = 0.8f;
         private readonly int maxLength = 10;
         private float speed = 0.5f;
         public int StartingLength => startingLength;
-        public float GrowSpeedGain => growSpeedGain;
+        public float GrowSpeedGainMultiply => growSpeedGainMultiply;
         public int MaxLength => maxLength;
 
         public float Speed

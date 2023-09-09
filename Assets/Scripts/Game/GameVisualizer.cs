@@ -136,7 +136,7 @@ namespace Game
             field.Fruits.Remove(snakeTile.TileObject);
             objectPools.FruitPool.Release(snakeTile.TileObject);
             snakeTile.TileObject = DrawObjectFromPool(snakeTile, objectPools.SnakePool);
-            snake.Speed -= snake.GrowSpeedGain;
+            snake.Speed *= snake.GrowSpeedGainMultiply;
             audioSource.PlayOneShot(fruitSound);
         }
 
