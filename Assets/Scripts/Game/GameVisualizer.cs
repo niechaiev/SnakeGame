@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using UI;
 using UnityEngine;
@@ -14,7 +15,7 @@ namespace Game
 
         [SerializeField] private GameObject gameCamera;
         [SerializeField] private GameObject emptyTilesParent;
-        
+
         [SerializeField] private PlayerControlsUI playerControlsUI;
         [SerializeField] private EndScreenUI endScreenUI;
         [SerializeField] private CounterScreenUI counterScreenUI;
@@ -36,7 +37,6 @@ namespace Game
 
         public Snake Snake => snake;
         public Field Field => field;
-        public Game Game => game;
 
         private void Awake()
         {
@@ -46,6 +46,8 @@ namespace Game
             InitializeGame();
             RecenterCamera();
             InstantiateEmptyTiles(field.Tiles);
+            endScreenUI.Subscribe(RestartGame);
+            playerControlsUI.Subscribe(game.TurnLeft, game.TurnRight);
         }
 
         private void RecenterCamera()
@@ -65,6 +67,7 @@ namespace Game
             field = new Field(AddFruitReferences);
             InitializeSnake();
             game = new Game(snake, field, EndGame);
+
             DrawTiles(field.Tiles);
 
             intervalCoroutine = StartCoroutine(Interval());
@@ -72,9 +75,8 @@ namespace Game
             endScreenUI.HideEndScreen();
         }
 
-        public void RestartGame()
+        private void RestartGame()
         {
-            StopGame();
             objectPools.ReleasePoolObjects();
             InitializeGame();
         }
@@ -193,6 +195,12 @@ namespace Game
             var pooledObject = pool.Get();
             pooledObject.transform.position = GetObjectPosition(tile);
             return pooledObject;
+        }
+
+        private void OnDestroy()
+        {
+            endScreenUI.UnSubscribe(RestartGame);
+            playerControlsUI.UnSubscribe(game.TurnLeft, game.TurnRight);
         }
     }
 }

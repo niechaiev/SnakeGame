@@ -1,5 +1,6 @@
 using Game;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UI
@@ -8,16 +9,23 @@ namespace UI
     {
         [SerializeField] private Button leftButton;
         [SerializeField] private Button rightButton;
-        [SerializeField] private GameVisualizer gameVisualizer;
-        
 
         private void OnEnable()
         {
-            leftButton.onClick.AddListener(gameVisualizer.Game.TurnLeft);
-            rightButton.onClick.AddListener(gameVisualizer.Game.TurnRight);
             leftButton.onClick.AddListener(DisableControls);
             rightButton.onClick.AddListener(DisableControls);
-            
+        }
+
+        public void Subscribe(UnityAction onLeftButton, UnityAction onRightButton)
+        {
+            leftButton.onClick.AddListener(onLeftButton);
+            rightButton.onClick.AddListener(onRightButton);
+        }
+
+        public void UnSubscribe(UnityAction onLeftButton, UnityAction onRightButton)
+        {
+            leftButton.onClick.RemoveListener(onLeftButton);
+            rightButton.onClick.RemoveListener(onRightButton);
         }
 
         private void DisableControls()
@@ -33,8 +41,6 @@ namespace UI
 
         private void OnDisable()
         {
-            leftButton.onClick.RemoveListener(gameVisualizer.Game.TurnLeft);
-            rightButton.onClick.RemoveListener(gameVisualizer.Game.TurnRight);
             leftButton.onClick.RemoveListener(DisableControls);
             rightButton.onClick.RemoveListener(DisableControls);
         }

@@ -13,7 +13,7 @@ namespace Game
         private readonly int minObstaclesAmount = 3;
         private readonly int maxObstaclesAmount = 5;
         private readonly int fruitAmount = 1;
-        
+
         private readonly Random random;
         private readonly Tile[,] tiles;
         private readonly List<GameObject> obstacles;
@@ -23,8 +23,9 @@ namespace Game
         public Tile[,] Tiles => tiles;
         public List<GameObject> Obstacles => obstacles;
         public List<GameObject> Fruits => fruits;
-        
+
         private Action<Tile> onGenerateFruit;
+        
 
         public Field(Action<Tile> onGenerateFruit)
         {

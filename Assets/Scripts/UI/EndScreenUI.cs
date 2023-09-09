@@ -1,30 +1,32 @@
+using System;
 using Game;
 using TMPro;
+using Unity.VisualScripting;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.UI;
 
 namespace UI
 {
     public class EndScreenUI : MonoBehaviour
     {
-        [SerializeField] private CanvasGroup endScreen; 
+        [SerializeField] private CanvasGroup endScreen;
         [SerializeField] private TMP_Text tmpText;
         [SerializeField] private Button restartButton;
-        [SerializeField] private GameVisualizer gameVisualizer;
         [SerializeField] private Color defeatColor;
         [SerializeField] private Color victoryColor;
         [SerializeField] private Image backgroundImage;
-        
-        private void Start()
+
+        public void Subscribe(UnityAction onRestartButtonPressed)
         {
-            restartButton.onClick.AddListener(RestartButtonPressed);
+            restartButton.onClick.AddListener(onRestartButtonPressed);
         }
 
-        private void RestartButtonPressed()
+        public void UnSubscribe(UnityAction onRestartButtonPressed)
         {
-            gameVisualizer.RestartGame();
+            restartButton.onClick.RemoveListener(onRestartButtonPressed);
         }
-        
+
         public void ShowDefeatScreen()
         {
             tmpText.text = "DEFEAT";
@@ -38,20 +40,17 @@ namespace UI
             ShowCanvasGroup(true);
             backgroundImage.color = victoryColor;
         }
+
         private void ShowCanvasGroup(bool state)
         {
-            endScreen.alpha = state ? 1: 0;
+            endScreen.alpha = state ? 1 : 0;
             endScreen.interactable = state;
             endScreen.blocksRaycasts = state;
         }
+
         public void HideEndScreen()
         {
             ShowCanvasGroup(false);
-        }
-
-        private void OnDestroy()
-        {
-            restartButton.onClick.RemoveListener(RestartButtonPressed);
         }
     }
 }
