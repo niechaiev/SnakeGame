@@ -23,6 +23,10 @@ namespace Game
         [SerializeField] private AudioClip fruitSound;
         [SerializeField] private AudioClip winSound;
         [SerializeField] private AudioClip loseSound;
+        [SerializeField] private AudioClip step1Sound;
+        [SerializeField] private AudioClip step2Sound;
+        private bool isStepTwo;
+        
         [SerializeField] private AudioSource audioSource;
 
         private readonly float spacing = 1.1f;
@@ -143,6 +147,8 @@ namespace Game
                 yield return new WaitForSeconds(snake.Speed);
                 game.NextStep();
                 playerControlsUI.EnableControls(true);
+                audioSource.PlayOneShot(isStepTwo? step2Sound : step1Sound);
+                isStepTwo = !isStepTwo;
             }
         }
 

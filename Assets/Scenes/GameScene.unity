@@ -301,7 +301,7 @@ GameObject:
   - component: {fileID: 484079872}
   - component: {fileID: 484079873}
   m_Layer: 0
-  m_Name: Game
+  m_Name: GameVisualizer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -346,6 +346,8 @@ MonoBehaviour:
   fruitSound: {fileID: 8300000, guid: afad6288941e43642b039727168fba2e, type: 3}
   winSound: {fileID: 8300000, guid: 6ea8f2791528aa048b63b41a9394dbcb, type: 3}
   loseSound: {fileID: 8300000, guid: 44f8797989f2c5843ac63603a85d2adb, type: 3}
+  step1Sound: {fileID: 8300000, guid: 4a15bfa3ca9e5954e8d0d4fbf7b9164b, type: 3}
+  step2Sound: {fileID: 8300000, guid: f24d70ce9fb666b46965cf0ac3f4c01f, type: 3}
   audioSource: {fileID: 484079873}
 --- !u!82 &484079873
 AudioSource:
@@ -356,7 +358,7 @@ AudioSource:
   m_GameObject: {fileID: 484079869}
   m_Enabled: 1
   serializedVersion: 4
-  OutputAudioMixerGroup: {fileID: 0}
+  OutputAudioMixerGroup: {fileID: -2348115198102781898, guid: 3ef9d64377599c6498ef073d5d26962a, type: 2}
   m_audioClip: {fileID: 0}
   m_PlayOnAwake: 1
   m_Volume: 1
