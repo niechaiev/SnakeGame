@@ -1,7 +1,5 @@
-using System;
-using Game;
+using Extensions;
 using TMPro;
-using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
@@ -30,27 +28,20 @@ namespace UI
         public void ShowDefeatScreen()
         {
             tmpText.text = "DEFEAT";
-            ShowCanvasGroup(true);
+            endScreen.ShowCanvasGroup(true);
             backgroundImage.color = defeatColor;
         }
 
         public void ShowVictoryScreen()
         {
             tmpText.text = "VICTORY";
-            ShowCanvasGroup(true);
+            endScreen.ShowCanvasGroup(true);
             backgroundImage.color = victoryColor;
-        }
-
-        private void ShowCanvasGroup(bool state)
-        {
-            endScreen.alpha = state ? 1 : 0;
-            endScreen.interactable = state;
-            endScreen.blocksRaycasts = state;
         }
 
         public void HideEndScreen()
         {
-            ShowCanvasGroup(false);
+            endScreen.ShowCanvasGroup(false);
         }
     }
 }

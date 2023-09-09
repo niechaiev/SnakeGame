@@ -47,7 +47,8 @@ namespace Game
             RecenterCamera();
             InstantiateEmptyTiles(field.Tiles);
             endScreenUI.Subscribe(RestartGame);
-            playerControlsUI.Subscribe(game.TurnLeft, game.TurnRight);
+
+            counterScreenUI.ShowCounter(true);
         }
 
         private void RecenterCamera()
@@ -67,11 +68,12 @@ namespace Game
             field = new Field(AddFruitReferences);
             InitializeSnake();
             game = new Game(snake, field, EndGame);
-
+            playerControlsUI.Subscribe(game.TurnLeft, game.TurnRight);
+            
             DrawTiles(field.Tiles);
 
             intervalCoroutine = StartCoroutine(Interval());
-            playerControlsUI.gameObject.SetActive(true);
+            playerControlsUI.ShowControls(true);
             endScreenUI.HideEndScreen();
         }
 
@@ -83,7 +85,8 @@ namespace Game
 
         private void StopGame()
         {
-            playerControlsUI.gameObject.SetActive(false);
+            playerControlsUI.ShowControls(false);
+            playerControlsUI.UnSubscribe(game.TurnLeft, game.TurnRight);
             StopCoroutine(intervalCoroutine);
             field.UnSubscribe(AddFruitReferences);
             snake.UnSubscribe(SwapTiles, GrowSnake, counterScreenUI.UpdateCount);
